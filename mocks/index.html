@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI English Polisher | SRE Portfolio</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#7f0df2",
+                        "background-light": "#f7f5f8",
+                        "background-dark": "#191022",
+                        "chat-bg": "#2b2d31",
+                        "sidebar-bg": "#1e1f22",
+                        "bubble-ai": "#383a40",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e1f22; border-radius: 10px; }
+        .typing-dot { animation: typing 1.4s infinite; }
+        @keyframes typing { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 overflow-hidden">
+<div class="flex h-screen w-full">
+<!-- Sidebar -->
+<aside class="w-72 bg-sidebar-bg flex flex-col border-r border-white/5">
+<div class="p-4 border-b border-white/5 flex items-center gap-3">
+<div class="bg-primary p-1.5 rounded-lg">
+<span class="material-symbols-outlined text-white text-xl">auto_fix_high</span>
+</div>
+<h1 class="font-bold text-lg tracking-tight">Polisher AI</h1>
+</div>
+<div class="p-4">
+<button class="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-semibold py-2.5 rounded-lg transition-all">
+<span class="material-symbols-outlined text-xl">add_box</span>
+<span>New Chat</span>
+</button>
+</div>
+<nav class="flex-1 overflow-y-auto px-2 custom-scrollbar">
+<div class="mb-4">
+<p class="px-3 text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Recent History</p>
+<div class="space-y-0.5">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-white/5 text-slate-100" href="#">
+<span class="material-symbols-outlined text-lg text-slate-400">chat_bubble</span>
+<span class="truncate text-sm">Meeting follow-up email</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 text-slate-400 hover:text-slate-100 transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">chat_bubble</span>
+<span class="truncate text-sm">PR description polish</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 text-slate-400 hover:text-slate-100 transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">chat_bubble</span>
+<span class="truncate text-sm">Slack announcement</span>
+</a>
+</div>
+</div>
+</nav>
+<div class="p-4 mt-auto border-t border-white/5 bg-sidebar-bg/50">
+<div class="flex items-center gap-3 group cursor-pointer">
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
+<span class="text-xs font-bold text-primary">JD</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold truncate">Jane Doe</p>
+<p class="text-xs text-slate-500">Free Tier</p>
+</div>
+<span class="material-symbols-outlined text-slate-500 text-lg group-hover:text-slate-300">settings</span>
+</div>
+</div>
+</aside>
+<!-- Main Chat Area -->
+<main class="flex-1 flex flex-col bg-chat-bg relative">
+<!-- Top Bar -->
+<header class="h-16 flex items-center justify-between px-6 border-b border-white/5 bg-chat-bg/80 backdrop-blur-sm z-10">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400">alternate_email</span>
+<h2 class="font-semibold">Project Polish</h2>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-slate-400 hover:text-slate-100">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="text-slate-400 hover:text-slate-100">
+<span class="material-symbols-outlined">help</span>
+</button>
+</div>
+</header>
+<!-- Conversation View -->
+<section class="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+<!-- AI Welcome Message -->
+<div class="flex items-start gap-4 max-w-4xl">
+<div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-white text-lg">smart_toy</span>
+</div>
+<div class="relative group max-w-[80%]">
+<div class="bg-bubble-ai px-4 py-3 rounded-2xl rounded-tl-none shadow-sm text-slate-200 leading-relaxed">
+<p>Hi! I'm your English polishing assistant. Paste any text or draft an email, and I'll help you make it sound professional and native.</p>
+<button class="absolute -top-1 -right-10 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 hover:bg-white/10 rounded-lg text-slate-400" title="Copy to clipboard">
+<span class="material-symbols-outlined text-base">content_copy</span>
+</button>
+</div>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex items-start justify-end gap-4 max-w-4xl ml-auto">
+<div class="relative group max-w-[80%]">
+<div class="bg-primary px-4 py-3 rounded-2xl rounded-tr-none shadow-sm text-white leading-relaxed">
+<p>Can you polish this email? "I want to ask for update on the deployment. Is it done yet? Let me know."</p>
+</div>
+</div>
+<div class="w-9 h-9 rounded-full bg-slate-700 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-white text-lg">person</span>
+</div>
+</div>
+<!-- AI Response -->
+<div class="flex items-start gap-4 max-w-4xl">
+<div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-white text-lg">smart_toy</span>
+</div>
+<div class="relative group max-w-[80%]">
+<div class="bg-bubble-ai px-4 py-3 rounded-2xl rounded-tl-none shadow-sm text-slate-200 leading-relaxed">
+<p class="mb-2 font-medium text-primary-400">Polished version:</p>
+<p class="italic text-slate-300">"I'm writing to request an update regarding the deployment. Could you please let me know if it has been completed yet? I look forward to hearing from you."</p>
+<div class="mt-4 pt-4 border-t border-white/5 text-sm text-slate-400">
+<p><strong>Changes:</strong> Added a professional opening, used formal phrasing ("request an update"), and included a standard closing.</p>
+</div>
+<button class="absolute -top-1 -right-10 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 hover:bg-white/10 rounded-lg text-slate-400" title="Copy to clipboard">
+<span class="material-symbols-outlined text-base">content_copy</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Loading State -->
+<div class="flex items-start gap-4 max-w-4xl">
+<div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-white text-lg">smart_toy</span>
+</div>
+<div class="bg-bubble-ai px-4 py-3 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-1">
+<div class="w-1.5 h-1.5 rounded-full bg-slate-400 typing-dot"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-slate-400 typing-dot [animation-delay:0.2s]"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-slate-400 typing-dot [animation-delay:0.4s]"></div>
+</div>
+</div>
+</section>
+<!-- Bottom Input Section -->
+<footer class="p-6 bg-chat-bg">
+<div class="max-w-4xl mx-auto">
+<!-- Mode Selector -->
+<div class="flex items-center gap-1 mb-4 bg-sidebar-bg/50 w-fit p-1 rounded-lg border border-white/5">
+<button class="px-4 py-1.5 rounded-md bg-white/10 text-white text-sm font-medium transition-all">Text Message</button>
+<button class="px-4 py-1.5 rounded-md text-slate-400 hover:text-slate-200 text-sm font-medium transition-all">Email</button>
+</div>
+<!-- Email Specific Fields (Visible when Email is active, simulated here) -->
+<div class="grid grid-cols-2 gap-3 mb-3">
+<div class="relative">
+<input class="w-full bg-bubble-ai border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-slate-500" placeholder="Recipient Name (e.g. Hiring Manager)" type="text"/>
+</div>
+<div class="relative">
+<input class="w-full bg-bubble-ai border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-slate-500" placeholder="Subject/Outline" type="text"/>
+</div>
+</div>
+<!-- Main Input Area -->
+<div class="bg-bubble-ai rounded-xl border border-white/10 shadow-xl overflow-hidden focus-within:border-primary/50 transition-colors">
+<textarea class="w-full bg-transparent border-none focus:ring-0 text-slate-200 p-4 resize-none min-h-[120px] custom-scrollbar" placeholder="Type or paste the text you want to polish..."></textarea>
+<div class="px-4 py-3 bg-black/10 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<button class="p-2 hover:bg-white/5 rounded-lg text-slate-400 transition-colors">
+<span class="material-symbols-outlined">attach_file</span>
+</button>
+<button class="p-2 hover:bg-white/5 rounded-lg text-slate-400 transition-colors">
+<span class="material-symbols-outlined">sentiment_satisfied</span>
+</button>
+</div>
+<button class="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-2 rounded-lg font-bold transition-all shadow-lg shadow-primary/20">
+<span>Polish</span>
+<span class="material-symbols-outlined text-xl">send</span>
+</button>
+</div>
+</div>
+<p class="text-center text-[10px] text-slate-600 mt-3 uppercase tracking-widest font-bold">Powered by Polisher-LLM v4.2</p>
+</div>
+</footer>
+</main>
+</div>
+</body></html>

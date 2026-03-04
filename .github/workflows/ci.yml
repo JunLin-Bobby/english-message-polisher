@@ -1,0 +1,66 @@
+# .github/workflows/ci.yml
+name: Continuous Integration (CI)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # ---------------------------------------------------------
+  # BACKEND CI: Linting and Unit Tests
+  # ---------------------------------------------------------
+  backend-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Pytest
+        run: |
+          # Execute the test suite
+          pytest tests/ -v
+
+
+  # ---------------------------------------------------------
+  # INFRASTRUCTURE CI: Docker Image Dry-Run
+  # ---------------------------------------------------------
+  docker-dry-run:
+    # Ensure this runs only if backend tests pass
+    needs: backend-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Image (Dry Run)
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          # CRITICAL: Do NOT push the image to any registry yet
+          push: false
+          # Tag it temporarily just to verify the build process completes successfully
+          tags: fastapi-backend:ci-test
+          # Utilize local caching to speed up CI runs
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
