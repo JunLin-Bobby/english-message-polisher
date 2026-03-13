@@ -2,7 +2,7 @@
 # Core Web Framework & Server
 # ==========================================
 # FastAPI framework for building high-performance APIs
-fastapi==0.110.0
+fastapi==0.128.0
 # ASGI server for local development and worker processes
 uvicorn[standard]==0.27.1
 # WSGI HTTP Server for UNIX, acting as the process manager in production
@@ -11,14 +11,14 @@ gunicorn==21.2.0
 # ==========================================
 # AI & LLM Integration
 # ==========================================
-# Official Google SDK to interact with the Gemini API for your AI enhancement features
-google-generativeai==0.4.1
+# NEW Official Google GenAI SDK (replaces google-generativeai)
+google-genai==1.65
 
 # ==========================================
 # Configuration & Validation
 # ==========================================
 # Data validation and settings management using Python type hints
-pydantic==2.6.3
+pydantic==2.12.5
 # Read and validate environment variables (e.g., GEMINI_API_KEY, SENTRY_DSN) safely
 pydantic-settings==2.2.1
 
@@ -34,4 +34,4 @@ sentry-sdk[fastapi]==1.40.6
 # The testing framework we configured in the GitHub Actions
 pytest==8.0.2
 # Required by FastAPI's TestClient to make async HTTP requests during tests
-httpx==0.27.0
+httpx==0.28.1
