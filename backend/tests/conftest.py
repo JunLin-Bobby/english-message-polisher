@@ -1,7 +1,10 @@
 #Setting public testing resources
+import os
 import pytest
 from fastapi.testclient import TestClient
 from core.dependencies import request_history
+
+os.environ["GEMINI_API_KEY"] = "dummy_test_key_for_ci"
 from main import app
 
 @pytest.fixture
