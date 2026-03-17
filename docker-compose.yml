@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------
+  # Backend Service (FastAPI)
+  # ----------------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: myapp-backend
+    ports:
+      - "8000:8000"
+    environment:
+      # Environment variables for testing
+      - ENVIRONMENT=development
+      - DATABASE_URL=postgresql://user:password@db:5432/myappdb
+    depends_on:
+      - db
+    networks:
+      - myapp-network
+
+  # ----------------------------------------
+  # Frontend Service (React + Nginx)
+  # ----------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: myapp-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - myapp-network
+
+  # ----------------------------------------
+  # Database Service (Optional but recommended)
+  # ----------------------------------------
+  db:
+    image: postgres:15-alpine
+    container_name: myapp-postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: myappdb
+    ports:
+      - "5432:5432"
+    volumes:
+      # Persist database data locally
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - myapp-network
+
+# Define the internal network
+networks:
+  myapp-network:
+    driver: bridge
+
+# Define persistent volumes
+volumes:
+  postgres_data:

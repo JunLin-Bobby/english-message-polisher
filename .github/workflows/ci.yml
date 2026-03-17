@@ -9,7 +9,7 @@ on:
 
 jobs:
   # ---------------------------------------------------------
-  # BACKEND CI: Linting and Unit Tests
+  # 1. BACKEND CI: Linting and Unit Tests
   # ---------------------------------------------------------
   backend-test:
     runs-on: ubuntu-latest
@@ -33,17 +33,42 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run Pytest
-        run: |
-          # Execute the test suite
-          pytest tests/ -v
-
+        run: pytest tests/ -v
 
   # ---------------------------------------------------------
-  # INFRASTRUCTURE CI: Docker Image Dry-Run
+  # 2. FRONTEND CI: Build Verification
   # ---------------------------------------------------------
-  docker-dry-run:
-    # Ensure this runs only if backend tests pass
-    needs: backend-test
+  frontend-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: './frontend/package-lock.json'
+
+      - name: Install Dependencies
+        run: npm ci
+        
+
+      # Verify that the React app can compile without syntax errors
+      - name: Build Frontend
+        run: npm run build
+
+  # ---------------------------------------------------------
+  # 3. INFRASTRUCTURE CI: Docker Build & Smoke Test
+  # ---------------------------------------------------------
+  docker-smoke-test:
+    # Ensure this runs ONLY if both backend and frontend tests pass
+    needs: [backend-test, frontend-test]
     runs-on: ubuntu-latest
 
     steps:
@@ -53,14 +78,46 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build Docker Image (Dry Run)
+      # --- Backend Container Test ---
+      - name: Build Backend Image
         uses: docker/build-push-action@v5
         with:
           context: ./backend
-          # CRITICAL: Do NOT push the image to any registry yet
           push: false
-          # Tag it temporarily just to verify the build process completes successfully
           tags: fastapi-backend:ci-test
-          # Utilize local caching to speed up CI runs
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          load: true # CRITICAL: Load image into local Docker daemon so we can run it
+
+      - name: Smoke Test Backend
+        run: |
+          # Run the container in the background
+          docker run -d -p 8000:8000 -e GEMINI_API_KEY="dummy_key_for_ci" --name test-backend fastapi-backend:ci-test
+          
+          # Wait a few seconds for Gunicorn/Uvicorn to start
+          sleep 5
+          
+          # Check if the container is still running (didn't crash immediately)
+          if [ "$(docker inspect -f '{{.State.Running}}' test-backend)" != "true" ]; then
+            echo "Backend container crashed on startup!"
+            docker logs test-backend
+            exit 1
+          fi
+          
+          # Send a request to the docs or a health check endpoint to verify it responds
+          curl --fail http://localhost:8000/docs || (echo "Backend is not responding properly" && exit 1)
+
+      # --- Frontend Container Test ---
+      - name: Build Frontend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: false
+          tags: react-frontend:ci-test
+          load: true
+
+      - name: Smoke Test Frontend
+        run: |
+          docker run -d -p 8080:80 --name test-frontend react-frontend:ci-test
+          sleep 3
+          
+          # Verify Nginx is serving the index.html page
+          curl --fail http://localhost:8080/ || (echo "Frontend Nginx is not responding" && exit 1)
