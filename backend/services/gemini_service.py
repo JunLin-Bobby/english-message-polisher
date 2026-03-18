@@ -49,7 +49,7 @@ class GeminiService:
                 model=self.model_name,
                 contents=prompt,
                 config=types.GenerateContentConfig(
-                    temperature=0.0, 
+                    temperature=0.5, 
                     thinking_config=types.ThinkingConfig(include_thoughts=False), 
                     response_mime_type="application/json",
                     response_schema=LLMRefinedOutput,
