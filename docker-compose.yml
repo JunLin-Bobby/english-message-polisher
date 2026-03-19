@@ -20,21 +20,7 @@ services:
     networks:
       - myapp-network
 
-  # ----------------------------------------
-  # Frontend Service (React + Nginx)
-  # ----------------------------------------
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: myapp-frontend
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
-    networks:
-      - myapp-network
-
+  
   # ----------------------------------------
   # Database Service (Optional but recommended)
   # ----------------------------------------
