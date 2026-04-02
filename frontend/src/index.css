@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 @import "tailwindcss";
@@ -7,20 +7,32 @@
 
 @theme {
   
-  --color-primary: #7f0df2;
-  --color-background-light: #f7f5f8;
-  --color-background-dark: #191022;
-  --color-chat-bg: #2b2d31;
-  --color-sidebar-bg: #1e1f22;
-  --color-bubble-ai: #383a40;
+  --color-primary: #b8893f;
+  --color-background-light: #f8f6eb;
+  --color-background-dark: #332b1f;
+  --color-chat-bg: #f8f6eb;
+  --color-sidebar-bg: #fffaf0;
+  --color-bubble-ai: #ffffff;
 
 
-  --font-display: "Inter", "sans-serif";
+  --font-display: "Manrope", "sans-serif";
 }
 
 @layer base {
+  html {
+    background: var(--color-background-light);
+  }
+
   body {
     font-family: var(--font-display);
+    background: var(--color-background-light);
+    color: #1f2937;
+    overflow-x: hidden;
+    margin: 0;
+  }
+
+  #root {
+    min-height: 100vh;
   }
 }
 
