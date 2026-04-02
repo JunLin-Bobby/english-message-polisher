@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import IntroModal from './IntroModal';
 
 // ==========================================
 // 1. Types & Interfaces
@@ -31,10 +32,10 @@ const DEFAULT_AI_MESSAGE: Message = {
 // ==========================================
 const TypingIndicator = () => (
   <div className="flex items-start gap-4 max-w-4xl animate-fade-in">
-    <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
+    <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-amber-900/10">
       <span className="material-symbols-outlined text-white text-lg">smart_toy</span>
     </div>
-    <div className="bg-bubble-ai px-4 py-4 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-1.5">
+    <div className="bg-white px-4 py-4 rounded-2xl rounded-tl-none shadow-sm border border-amber-100 flex items-center gap-1.5">
       <div className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-[bounce_1.4s_infinite_0s]"></div>
       <div className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-[bounce_1.4s_infinite_0.2s]"></div>
       <div className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-[bounce_1.4s_infinite_0.4s]"></div>
@@ -58,13 +59,13 @@ const MessageBubble = ({ msg }: { msg: Message }) => {
   // Render User Message
   if (!isAI && !isError) {
     return (
-      <div className="flex items-start justify-end gap-4 max-w-4xl ml-auto animate-fade-in-up">
-        <div className="relative group max-w-[80%]">
-          <div className="bg-primary px-4 py-3 rounded-2xl rounded-tr-none shadow-sm text-white leading-relaxed whitespace-pre-wrap">
+      <div className="flex items-start justify-end gap-3 sm:gap-4 max-w-4xl ml-auto animate-fade-in-up">
+        <div className="relative group max-w-[92%] sm:max-w-[80%]">
+          <div className="bg-slate-900 px-4 py-3 rounded-2xl rounded-tr-none shadow-sm text-white leading-relaxed whitespace-pre-wrap">
             {msg.content}
           </div>
         </div>
-        <div className="w-9 h-9 rounded-full bg-slate-700 flex items-center justify-center shrink-0">
+        <div className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center shrink-0 shadow-sm">
           <span className="material-symbols-outlined text-white text-lg">person</span>
         </div>
       </div>
@@ -73,21 +74,21 @@ const MessageBubble = ({ msg }: { msg: Message }) => {
 
   // Render AI or Error Message
   return (
-    <div className="flex items-start gap-4 max-w-4xl animate-fade-in-up">
-      <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 shadow-lg ${isError ? 'bg-red-500 shadow-red-500/20' : 'bg-primary shadow-primary/20'}`}>
+    <div className="flex items-start gap-3 sm:gap-4 max-w-4xl animate-fade-in-up">
+      <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 shadow-lg ${isError ? 'bg-red-500 shadow-red-500/20' : 'bg-primary shadow-amber-900/10'}`}>
         <span className="material-symbols-outlined text-white text-lg">{isError ? 'error' : 'smart_toy'}</span>
       </div>
-      <div className="relative group max-w-[80%]">
-        <div className={`px-4 py-3 rounded-2xl rounded-tl-none shadow-sm leading-relaxed ${isError ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-bubble-ai text-slate-200'}`}>
+      <div className="relative group max-w-[92%] sm:max-w-[80%]">
+        <div className={`px-4 py-3 rounded-2xl rounded-tl-none shadow-sm leading-relaxed border ${isError ? 'bg-red-50 text-red-700 border-red-200' : 'bg-white text-slate-800 border-amber-100'}`}>
           {msg.subject && (
-            <div className="mb-2 pb-2 border-b border-white/5">
+            <div className="mb-2 pb-2 border-b border-amber-100">
               <span className="font-semibold text-primary">Subject: </span>
-              <span className="text-slate-100">{msg.subject}</span>
+              <span className="text-slate-700">{msg.subject}</span>
             </div>
           )}
           <div className="whitespace-pre-wrap">{msg.content}</div>
           {!isError && (
-            <button onClick={handleCopy} className="absolute -top-1 -right-10 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 hover:bg-white/10 rounded-lg text-slate-400" title="Copy to clipboard">
+            <button onClick={handleCopy} className="absolute -top-1 -right-10 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 hover:bg-amber-50 rounded-lg text-slate-500" title="Copy to clipboard">
               <span className="material-symbols-outlined text-base">{isCopied ? 'check' : 'content_copy'}</span>
             </button>
           )}
@@ -107,29 +108,62 @@ const Sidebar = ({
   activeThreadId, 
   onSelectThread, 
   onCreateNewThread, 
-  onDeleteThread 
+  onDeleteThread,
+  isOpen,
+  onClose,
+  onOpenIntro
 }: { 
   chatThreads: ChatThread[], 
   activeThreadId: string | null, 
   onSelectThread: (id: string) => void, 
   onCreateNewThread: () => void,
-  onDeleteThread: (id: string, event: React.MouseEvent) => void 
+  onDeleteThread: (id: string, event: React.MouseEvent) => void,
+  isOpen: boolean,
+  onClose: () => void,
+  onOpenIntro: () => void
 }) => {
   return (
-    <aside className="w-72 bg-sidebar-bg flex flex-col border-r border-white/5 h-screen shrink-0">
+    <>
+      <button
+        type="button"
+        onClick={onClose}
+        className={`fixed inset-0 z-40 bg-black/40 transition-opacity duration-300 lg:hidden ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        aria-label="Close sidebar"
+      />
+      <aside className={`fixed inset-y-0 left-0 z-50 w-[min(20rem,85vw)] bg-white/95 backdrop-blur-sm flex flex-col border-r border-amber-200/70 shadow-2xl transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 lg:w-80`}>
       {/* App Title */}
-      <div className="p-4 border-b border-white/5 flex items-center gap-3">
-        <div className="bg-primary p-1.5 rounded-lg">
-          <span className="material-symbols-outlined text-white text-xl">auto_fix_high</span>
+      <div className="p-4 sm:p-5 border-b border-amber-200/70 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="bg-primary p-1.5 rounded-lg shadow-sm shadow-amber-900/10">
+            <span className="material-symbols-outlined text-white text-xl">auto_fix_high</span>
+          </div>
+          <h1 className="font-bold text-lg tracking-tight text-slate-900 truncate">Polisher AI</h1>
         </div>
-        <h1 className="font-bold text-lg tracking-tight text-slate-100">Polisher AI</h1>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <button
+            type="button"
+            onClick={onOpenIntro}
+            className="inline-flex items-center justify-center w-9 h-9 rounded-xl border border-amber-200 bg-white text-slate-700 shadow-sm transition hover:bg-amber-50 hover:text-slate-900"
+            aria-label="Open introduction"
+          >
+            <span className="material-symbols-outlined text-xl">help</span>
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-amber-50 transition-colors"
+            aria-label="Close sidebar"
+          >
+            <span className="material-symbols-outlined text-xl">close</span>
+          </button>
+        </div>
       </div>
 
       {/* New Chat Action */}
-      <div className="p-4">
+      <div className="p-4 sm:p-5">
         <button 
           onClick={onCreateNewThread}
-          className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-semibold py-2.5 rounded-lg transition-all"
+          className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-semibold py-2.5 rounded-xl transition-all shadow-md shadow-amber-900/10"
         >
           <span className="material-symbols-outlined text-xl">add_box</span>
           <span>New Chat</span>
@@ -137,7 +171,7 @@ const Sidebar = ({
       </div>
 
       {/* Thread History Navigation */}
-      <nav className="flex-1 overflow-y-auto px-2 custom-scrollbar">
+      <nav className="flex-1 overflow-y-auto px-2 custom-scrollbar max-h-[50vh] lg:max-h-none">
         <div className="mb-4">
           <p className="px-3 text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Recent History</p>
           <div className="space-y-0.5">
@@ -145,7 +179,7 @@ const Sidebar = ({
               <div 
                 key={thread.id}
                 onClick={() => onSelectThread(thread.id)}
-                className={`flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer transition-colors group ${activeThreadId === thread.id ? 'bg-white/10 text-slate-100' : 'hover:bg-white/5 text-slate-400 hover:text-slate-100'}`}
+                className={`flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer transition-colors group ${activeThreadId === thread.id ? 'bg-amber-100 text-slate-900' : 'hover:bg-amber-50 text-slate-600 hover:text-slate-900'}`}
               >
                 <div className="flex items-center gap-3 overflow-hidden">
                   <span className="material-symbols-outlined text-lg shrink-0">chat_bubble</span>
@@ -153,7 +187,7 @@ const Sidebar = ({
                 </div>
                 <button 
                   onClick={(event) => onDeleteThread(thread.id, event)}
-                  className="opacity-0 group-hover:opacity-100 hover:text-red-400 transition-opacity p-1 shrink-0"
+                  className="opacity-100 lg:opacity-0 lg:group-hover:opacity-100 hover:text-red-500 transition-opacity p-1 shrink-0 text-slate-500 lg:text-slate-400"
                   aria-label="Delete thread"
                 >
                   <span className="material-symbols-outlined text-sm">delete</span>
@@ -165,19 +199,20 @@ const Sidebar = ({
       </nav>
 
       {/* User Profile Stub (Guest Mode) */}
-      <div className="p-4 mt-auto border-t border-white/5 bg-sidebar-bg/50">
+      <div className="p-4 sm:p-5 mt-auto border-t border-amber-200/70 bg-white/60">
         <div className="flex items-center gap-3 group cursor-pointer">
-          <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center border border-slate-600">
-            <span className="text-xs font-bold text-slate-300">GU</span>
+          <div className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center border border-slate-700 shadow-sm">
+            <span className="text-xs font-bold text-white">GU</span>
           </div>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-slate-200 truncate">Guest User</p>
+            <p className="text-sm font-semibold text-slate-800 truncate">Guest User</p>
             <p className="text-xs text-slate-500">Local Environment</p>
           </div>
-          <span className="material-symbols-outlined text-slate-500 text-lg group-hover:text-slate-300">settings</span>
+          <span className="material-symbols-outlined text-slate-500 text-lg group-hover:text-slate-700">settings</span>
         </div>
       </div>
     </aside>
+    </>
   );
 };
 
@@ -203,7 +238,7 @@ const ChatWindow = ({
 
   // Handle empty state when no thread is selected
   if (!activeThread) {
-    return <main className="flex-1 flex items-center justify-center bg-chat-bg text-slate-500">Select or start a new chat</main>;
+    return <main className="flex-1 flex min-w-0 items-center justify-center bg-background-light text-slate-500">Select or start a new chat</main>;
   }
 
   const handleMessageSubmit = async () => {
@@ -224,8 +259,9 @@ const ChatWindow = ({
     setInputText('');
     setIsLoading(true);
 
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
     try {
-      const response = await fetch('/api/v1/polish', {
+      const response = await fetch(`${baseUrl}/api/v1/polish`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -262,48 +298,48 @@ const ChatWindow = ({
   };
 
   return (
-    <main className="flex-1 flex flex-col bg-chat-bg h-screen relative">
-      <header className="h-16 flex items-center justify-between px-6 border-b border-white/5 bg-chat-bg/80 backdrop-blur-sm z-10 shrink-0 text-slate-100">
-        <div className="flex items-center gap-3">
-          <span className="material-symbols-outlined text-slate-400">alternate_email</span>
-          <h2 className="font-semibold">{activeThread.title}</h2>
+    <main className="flex-1 flex min-w-0 flex-col bg-background-light h-screen relative">
+      <header className="flex items-center justify-between gap-3 px-4 py-4 sm:px-6 border-b border-amber-200/70 bg-white/70 backdrop-blur-sm z-10 shrink-0 text-slate-900">
+        <div className="flex items-center gap-3 min-w-0">
+          <span className="material-symbols-outlined text-slate-500">alternate_email</span>
+          <h2 className="font-semibold truncate">{activeThread.title}</h2>
         </div>
       </header>
 
-      <section className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+      <section className="flex-1 overflow-y-auto px-4 py-5 sm:px-6 space-y-6 custom-scrollbar">
         {activeThread.messages.map(msg => <MessageBubble key={msg.id} msg={msg} />)}
         {isLoading && <TypingIndicator />}
         <div ref={chatEndRef} />
       </section>
 
-      <footer className="p-6 bg-chat-bg shrink-0">
-        <div className="max-w-4xl mx-auto">
+      <footer className="px-4 pb-4 pt-2 sm:p-6 bg-background-light shrink-0 border-t border-amber-200/70">
+        <div className="max-w-4xl mx-auto w-full">
           {/* Mode Toggles */}
-          <div className="flex items-center gap-1 mb-4 bg-sidebar-bg/50 w-fit p-1 rounded-lg border border-white/5">
-            <button onClick={() => setMode('general')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${mode === 'general' ? 'bg-white/10 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'}`}>Text Message</button>
-            <button onClick={() => setMode('email')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${mode === 'email' ? 'bg-white/10 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'}`}>Email</button>
+          <div className="flex w-full sm:w-fit flex-col sm:flex-row gap-2 sm:gap-1 mb-4 bg-white/80 p-2 rounded-2xl border border-amber-200/70 shadow-sm">
+            <button onClick={() => setMode('general')} className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${mode === 'general' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-amber-50'}`}>Text Message</button>
+            <button onClick={() => setMode('email')} className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${mode === 'email' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-amber-50'}`}>Email</button>
           </div>
           
           {/* Expandable Email Context Fields */}
-          <div className={`grid grid-cols-2 gap-3 overflow-hidden transition-all duration-300 ease-in-out ${mode === 'email' ? 'max-h-20 mb-3 opacity-100' : 'max-h-0 mb-0 opacity-0'}`}>
-            <input value={recipient} onChange={e => setRecipient(e.target.value)} className="w-full bg-bubble-ai border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:ring-1 focus:ring-primary outline-none text-slate-200 placeholder:text-slate-500" placeholder="Recipient Name" type="text" />
-            <input value={subject} onChange={e => setSubject(e.target.value)} className="w-full bg-bubble-ai border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:ring-1 focus:ring-primary outline-none text-slate-200 placeholder:text-slate-500" placeholder="Context / Subject intent" type="text" />
+          <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-hidden transition-all duration-300 ease-in-out ${mode === 'email' ? 'max-h-28 mb-3 opacity-100' : 'max-h-0 mb-0 opacity-0'}`}>
+            <input value={recipient} onChange={e => setRecipient(e.target.value)} className="w-full bg-white border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:ring-1 focus:ring-primary outline-none text-slate-900 placeholder:text-slate-400 shadow-sm" placeholder="Recipient Name" type="text" />
+            <input value={subject} onChange={e => setSubject(e.target.value)} className="w-full bg-white border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:ring-1 focus:ring-primary outline-none text-slate-900 placeholder:text-slate-400 shadow-sm" placeholder="Context / Subject intent" type="text" />
           </div>
 
           {/* Textarea & Actions */}
-          <div className="bg-bubble-ai rounded-xl border border-white/10 shadow-xl overflow-hidden focus-within:border-primary/50 transition-colors">
+          <div className="bg-white rounded-2xl border border-amber-200 shadow-md overflow-hidden focus-within:border-primary/50 transition-colors">
             <textarea 
               value={inputText} onChange={e => setInputText(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleMessageSubmit(); } }}
               disabled={isLoading}
-              className="w-full bg-transparent border-none focus:ring-0 text-slate-200 p-4 resize-none min-h-[120px] custom-scrollbar outline-none" 
+              className="w-full bg-transparent border-none focus:ring-0 text-slate-900 p-4 sm:p-5 resize-none min-h-[140px] custom-scrollbar outline-none" 
               placeholder="Type or paste the text you want to polish..."
             />
-            <div className="px-4 py-3 bg-black/10 flex items-center justify-between">
+            <div className="px-4 py-3 bg-amber-50/70 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2">
-                <button className="p-2 hover:bg-white/5 rounded-lg text-slate-400 transition-colors"><span className="material-symbols-outlined">attach_file</span></button>
+                <button className="p-2 hover:bg-white rounded-lg text-slate-500 transition-colors"><span className="material-symbols-outlined">attach_file</span></button>
               </div>
-              <button onClick={handleMessageSubmit} disabled={!inputText.trim() || isLoading} className="flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:bg-primary/50 text-white px-5 py-2 rounded-lg font-bold transition-all shadow-lg shadow-primary/20">
+              <button onClick={handleMessageSubmit} disabled={!inputText.trim() || isLoading} className="flex w-full sm:w-auto items-center justify-center gap-2 bg-primary hover:bg-primary/90 disabled:bg-primary/50 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-amber-900/10">
                 <span>{isLoading ? 'Polishing...' : 'Polish'}</span>
                 <span className="material-symbols-outlined text-xl">send</span>
               </button>
@@ -319,6 +355,9 @@ const ChatWindow = ({
 // 4. Main Orchestrator (The Smart Component)
 // ==========================================
 export default function MainLayout() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isIntroModalOpen, setIsIntroModalOpen] = useState(true);
+  const [isHelpTriggeredIntro, setIsHelpTriggeredIntro] = useState(false);
   // 1. Lazy Initialization: Pass a callback to useState to read from localStorage synchronously.
   // This prevents race conditions and avoids unnecessary JSON parsing on subsequent renders.
   const [chatThreads, setChatThreads] = useState<ChatThread[]>(() => {
@@ -347,6 +386,20 @@ export default function MainLayout() {
   useEffect(() => {
     localStorage.setItem('polisher_chat_history', JSON.stringify(chatThreads));
   }, [chatThreads]);
+
+  // Show intro modal by default unless the user opted out.
+  useEffect(() => {
+    const hideIntroModal = localStorage.getItem('hideIntroModal');
+    setIsHelpTriggeredIntro(false);
+    setIsIntroModalOpen(hideIntroModal !== 'true');
+  }, []);
+
+  const handleConfirmIntroModal = (dontShowAgain: boolean) => {
+    if (dontShowAgain) {
+      localStorage.setItem('hideIntroModal', 'true');
+    }
+    setIsIntroModalOpen(false);
+  };
 
   // Handle the creation of a brand new, empty chat thread.
   const createNewChatThread = () => {
@@ -397,17 +450,43 @@ export default function MainLayout() {
   };
 
   return (
-    <div className="flex h-screen w-full font-display">
+    <div className="relative flex min-h-screen w-full font-display overflow-x-hidden bg-background-light text-slate-900 lg:pl-80">
+      <button
+        type="button"
+        onClick={() => setIsSidebarOpen(true)}
+        className="fixed left-4 top-4 z-50 inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-amber-200 bg-white/90 text-slate-700 shadow-lg shadow-amber-900/10 backdrop-blur-sm transition hover:bg-amber-50 hover:text-slate-900 lg:hidden"
+        aria-label="Open sidebar"
+      >
+        <span className="material-symbols-outlined text-2xl">menu</span>
+      </button>
       <Sidebar 
         chatThreads={chatThreads} 
         activeThreadId={activeThreadId} 
-        onSelectThread={setActiveThreadId} 
-        onCreateNewThread={createNewChatThread}
+        onSelectThread={(id) => {
+          setActiveThreadId(id);
+          setIsSidebarOpen(false);
+        }} 
+        onCreateNewThread={() => {
+          createNewChatThread();
+          setIsSidebarOpen(false);
+        }}
         onDeleteThread={deleteChatThread}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        onOpenIntro={() => {
+          setIsHelpTriggeredIntro(true);
+          setIsIntroModalOpen(true);
+        }}
       />
       <ChatWindow 
         activeThread={chatThreads.find(thread => thread.id === activeThreadId)} 
         onUpdateThread={updateActiveChatThread} 
+      />
+      <IntroModal
+        isOpen={isIntroModalOpen}
+        onConfirm={handleConfirmIntroModal}
+        onClose={() => setIsIntroModalOpen(false)}
+        showDontShowOption={!isHelpTriggeredIntro}
       />
     </div>
   );
