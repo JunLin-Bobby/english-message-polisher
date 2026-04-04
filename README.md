@@ -72,7 +72,7 @@ This project goes beyond a simple AI integration tool — it is an **enterprise-
                         │   │                                              │  │
                         │   │         ┌──────────────────────┐            │  │
                         │   │         │   Parameter Store    │            │  │
-                        │   │         │  (GEMINI_API_KEY 🔑) │            │  │
+                        │   │         │  (GEMINI_API_KEY ) │            │  │
                         │   │         └──────────────────────┘            │  │
                         │   └──────────────────────────────────────────┘  │  │
                         │                                                     │
