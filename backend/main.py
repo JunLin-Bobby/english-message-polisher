@@ -1,5 +1,6 @@
 from fastapi import  FastAPI
 from api.polish import router as polish_router, gemini_service
+from mangum import Mangum 
 from fastapi.middleware.cors import CORSMiddleware
 from core.logger import logger
 from contextlib import asynccontextmanager
@@ -46,3 +47,5 @@ def health_check():
     Health check endpoint for load balancers and container orchestration (e.g., Docker/AWS).
     """
     return {"status": "healthy"}
+    
+handler = Mangum(app) 
