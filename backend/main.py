@@ -12,11 +12,8 @@ async def lifespan(app: FastAPI):
    
     logger.info("Application starting up...")
     yield 
-    
-   
     logger.info("Application shutting down, cleaning up resources...")
-   
-    await gemini_service.close()
+    await gemini_service.close() 
 # ==========================================
 # Application Initialization
 # ==========================================
@@ -47,5 +44,5 @@ def health_check():
     Health check endpoint for load balancers and container orchestration (e.g., Docker/AWS).
     """
     return {"status": "healthy"}
-    
+
 handler = Mangum(app) 

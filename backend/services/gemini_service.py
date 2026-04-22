@@ -21,8 +21,15 @@ class GeminiService:
             logger.critical("GEMINI_API_KEY is missing from environment variables.")
             raise RuntimeError("AI Service configuration missing.")
 
-        self.client = genai.Client(api_key=api_key)
+        self._api_key = api_key
         self.model_name = "gemini-2.5-flash-lite"
+        self._client = None
+
+    @property
+    def client(self):
+        if self._client is None:
+            self._client = genai.Client(api_key=self._api_key)
+        return self._client
     
     def _build_prompt(self,text:str,tone:str,mode:str,recipient:str = None,subject:str = None) -> str:
         context_section = ""
@@ -71,11 +78,8 @@ class GeminiService:
                 raise HTTPException(status_code=500, detail="AI Service encountered an unexpected error.")
         
     async def close(self):
-        """
-        Gracefully close the underlying HTTP connections.
-        """
-        if hasattr(self, 'client') and self.client:
-            await self.client.aio.aclose()
-            self.client.close()
+        if self._client:
+            await self._client.aio.aclose()
+            self._client.close()
+            self._client = None  # 設成 None，下次存取時會重建
             logger.info("Gemini AI client connections closed successfully.")
-        
