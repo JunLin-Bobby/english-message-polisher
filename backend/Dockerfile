@@ -1,7 +1,7 @@
 # backend/Dockerfile
 
 # Use the official lightweight Python 3.11 image
-FROM python:3.11-slim
+FROM public.ecr.aws/lambda/python:3.11
 
 # Set environment variables to ensure stable behavior
 ENV PYTHONDONTWRITEBYTECODE=1
