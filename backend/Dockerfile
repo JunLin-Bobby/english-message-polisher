@@ -1,39 +1,24 @@
 # backend/Dockerfile
 
-# Use the official lightweight Python 3.11 image
+# Lambda-compatible base image (Amazon Linux 2 + Python 3.11 runtime)
+# Replaces python:3.11-slim which does not support Lambda's handler entrypoint format
 FROM public.ecr.aws/lambda/python:3.11
 
 # Set environment variables to ensure stable behavior
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Create a dedicated non-root user and group for security
-RUN addgroup --system appgroup && adduser --system --group appuser
+# Install system dependencies
+# Note: Lambda base image uses Amazon Linux (yum), not Debian (apt-get)
+RUN yum install -y gcc && yum clean all
 
-# Set the working directory
-WORKDIR /app
-
-# Install system dependencies (e.g., for building certain Python packages)
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends gcc libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy requirements first to leverage Docker cache for dependencies
+# Copy and install Python dependencies into Lambda's task root
+# LAMBDA_TASK_ROOT is a built-in env var pointing to /var/task
 COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt --target "${LAMBDA_TASK_ROOT}"
 
-# Install dependencies as root before switching users
-RUN pip install --no-cache-dir -r requirements.txt 
+# Copy application code into Lambda's task root
+COPY . ${LAMBDA_TASK_ROOT}
 
-# Copy the rest of the application code
-COPY --chown=appuser:appgroup . .
-
-# Transfer ownership of the application files to the non-root user
-RUN chown -R appuser:appgroup /app
-
-# Switch to the non-root user to run the application securely
-USER appuser
-
-EXPOSE 8000
-
-# Default command (can be overridden during testing)
+# Lambda entrypoint: points to handler = Mangum(app) in main.py
 CMD ["main.handler"]
