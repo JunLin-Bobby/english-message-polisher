@@ -11,6 +11,7 @@ services:
     container_name: myapp-backend
     ports:
       - "8000:8000"
+    command: ["gunicorn", "main:app", "--workers", "4", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
     environment:
       # Environment variables for testing
       - ENVIRONMENT=development

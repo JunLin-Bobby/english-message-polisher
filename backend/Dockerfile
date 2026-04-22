@@ -36,4 +36,4 @@ USER appuser
 EXPOSE 8000
 
 # Default command (can be overridden during testing)
-CMD ["gunicorn", "main:app", "--workers", "4", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
+CMD ["main.handler"]
