@@ -62,8 +62,8 @@ jobs:
 
   # ---------------------------------------------------------
   # 3. INFRASTRUCTURE CI: Docker Build & Smoke Test
-  # 注意：CMD 已改成 main.handler (Lambda 模式)
-  # 所以 smoke test 改用 uvicorn 直接啟動，不再用 gunicorn
+  # CMD is set to main.handler (Lambda mode) and cannot serve HTTP directly.
+  # Override entrypoint with uvicorn for smoke testing purposes.
   # ---------------------------------------------------------
   docker-smoke-test:
     needs: [backend-test]
@@ -86,24 +86,25 @@ jobs:
 
       - name: Smoke Test Backend
         run: |
-          # CMD is now set to main.handler (Lambda mode) and cannot serve HTTP directly.
-          # Override the entrypoint with uvicorn for local smoke testing purposes.
+          # Lambda base image installs packages to /var/task, not the system $PATH.
+          # Use python -m uvicorn to invoke it directly from the installed module.
           docker run -d -p 8000:8000 \
             -e GEMINI_API_KEY="dummy_key_for_ci" \
             --name test-backend \
-            --entrypoint uvicorn \
+            --entrypoint python \
+            --workdir /var/task \
             fastapi-backend:ci-test \
-            main:app --host 0.0.0.0 --port 8000
+            -m uvicorn main:app --host 0.0.0.0 --port 8000
 
-          # Wait uvicorn startup
+          # Wait for uvicorn to start
           sleep 5
 
-          # Make sure the container is running
+          # Check if the container is still running
           if [ "$(docker inspect -f '{{.State.Running}}' test-backend)" != "true" ]; then
             echo "Backend container crashed on startup!"
             docker logs test-backend
             exit 1
           fi
 
-          # 打 /docs 確認 FastAPI 正常回應
+          # Verify FastAPI responds on /docs
           curl --fail http://localhost:8000/docs || (echo "Backend is not responding properly" && exit 1)
