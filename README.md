@@ -1,4 +1,4 @@
-#  Cloud-Native AI English Polisher
+# 🚀 Cloud-Native AI English Polisher
 
 ![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-web-services&logoColor=white)
 ![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?style=for-the-badge&logo=terraform&logoColor=white)
@@ -13,7 +13,7 @@ This project goes beyond a simple AI integration tool — it is an **enterprise-
 
 ##  Live Demo
 
- **Try it out here:** [https://d3w0l0fefqonl3.cloudfront.net/](https://d3w0l0fefqonl3.cloudfront.net/)
+**Try it out here:** [https://d3w0l0fefqonl3.cloudfront.net/](https://d3w0l0fefqonl3.cloudfront.net/)
 
 ##  How it Works
 
@@ -37,49 +37,39 @@ This project goes beyond a simple AI integration tool — it is an **enterprise-
                         │   └──────────────────────────────────────│──│───┘   │
                         │                                          │  │       │
                         │          ┌───────────────────────────────┘  │       │
-                        │          │  HTTP :80                        │       │
+                        │          │  HTTPS (AllViewerExceptHostHeader)│       │
                         │          ▼                                  │       │
-                        │   ┌─────────────┐          ┌───────────────┴────┐  │
-                        │   │     ALB     │          │    S3 Bucket       │  │
-                        │   │(public, :80)│          │ (React Static SPA) │  │
-                        │   └──────┬──────┘          │  (private, OAC)    │  │
-                        │          │ HTTP :8000       └────────────────────┘  │
-                        │          │                                          │
-                        │   ┌──────▼──────────────────────────────────────┐  │
-                        │   │                VPC (10.0.0.0/16)            │  │
-                        │   │                                              │  │
-                        │   │  ┌─────────────────────────────────────┐    │  │
-                        │   │  │       Public Subnets                │    │  │
-                        │   │  │   us-east-1a        us-east-1b      │    │  │
-                        │   │  │  10.0.101.0/24     10.0.102.0/24   │    │  │
-                        │   │  │                                     │    │  │
-                        │   │  │   ┌─────────────────────────────┐   │    │  │
-                        │   │  │   │    ECS Fargate (Serverless) │   │    │  │
-                        │   │  │   │   ┌─────────────────────┐   │   │    │  │
-                        │   │  │   │   │  FastAPI Container   │   │   │    │  │
-                        │   │  │   │   │    Port :8000        │   │   │    │  │
-                        │   │  │   │   └──────────┬──────────┘   │   │    │  │
-                        │   │  │   └──────────────│──────────────┘   │    │  │
-                        │   │  └──────────────────│──────────────────┘    │  │
-                        │   │                     │                        │  │
-                        │   │         ┌───────────┴──────────┐            │  │
-                        │   │         │                      │            │  │
-                        │   │         ▼                      ▼            │  │
-                        │   │  ┌─────────────┐    ┌──────────────────┐   │  │
-                        │   │  │  CloudWatch │    │   ECR Registry   │   │  │
-                        │   │  │    Logs     │    │  (Docker Images) │   │  │
-                        │   │  └─────────────┘    └──────────────────┘   │  │
-                        │   │                                              │  │
-                        │   │         ┌──────────────────────┐            │  │
-                        │   │         │   Parameter Store    │            │  │
-                        │   │         │  (GEMINI_API_KEY ) │            │  │
-                        │   │         └──────────────────────┘            │  │
-                        │   └──────────────────────────────────────────┘  │  │
+                        │   ┌──────────────────┐     ┌───────────────┴────┐  │
+                        │   │  Lambda Function  │     │    S3 Bucket       │  │
+                        │   │  URL (HTTPS only) │     │ (React Static SPA) │  │
+                        │   └────────┬─────────┘     │  (private, OAC)    │  │
+                        │            │                └────────────────────┘  │
+                        │            ▼                                        │
+                        │   ┌──────────────────────────────────────────────┐  │
+                        │   │         AWS Lambda (Serverless)              │  │
+                        │   │   ┌──────────────────────────────────────┐   │  │
+                        │   │   │  FastAPI + Mangum (Container Image)  │   │  │
+                        │   │   │  Memory: 1024MB  Timeout: 60s        │   │  │
+                        │   │   └──────────────┬───────────────────────┘   │  │
+                        │   └──────────────────│───────────────────────────┘  │
+                        │                      │                              │
+                        │         ┌────────────┴──────────┐                  │
+                        │         │                       │                  │
+                        │         ▼                       ▼                  │
+                        │  ┌─────────────┐    ┌──────────────────┐          │
+                        │  │  CloudWatch │    │   ECR Registry   │          │
+                        │  │    Logs     │    │  (Docker Images) │          │
+                        │  └─────────────┘    └──────────────────┘          │
                         │                                                     │
-                        │              ┌──────────────────────┐               │
-                        │              │   IAM Roles          │               │
-                        │              │  (Zero-Trust Policy) │               │
-                        │              └──────────────────────┘               │
+                        │         ┌──────────────────────┐                   │
+                        │         │   SSM Parameter Store│                   │
+                        │         │  (GEMINI_API_KEY 🔑) │                   │
+                        │         └──────────────────────┘                   │
+                        │                                                     │
+                        │         ┌──────────────────────┐                   │
+                        │         │   IAM Roles          │                   │
+                        │         │  (Zero-Trust Policy) │                   │
+                        │         └──────────────────────┘                   │
                         └─────────────────────────────────────────────────────┘
                                                │
                                                │ HTTPS (Gemini API)
@@ -93,19 +83,18 @@ This project goes beyond a simple AI integration tool — it is an **enterprise-
 **Traffic flow summary:**
 
 - `/*` → CloudFront → **S3** (React SPA, served via OAC)
-- `/api/*` → CloudFront → **ALB** → **ECS Fargate** (FastAPI, port 8000)
-- ECS outbound → **Gemini API** (via public IP, no NAT Gateway needed)
+- `/api/*` → CloudFront (AllViewerExceptHostHeader policy) → **Lambda Function URL** → **Lambda** (FastAPI + Mangum)
+- Lambda outbound → **Gemini API** (via public internet, no VPC/NAT needed)
 - Secrets injected at runtime from **SSM Parameter Store**
 
-##  Tech Stack
+## 🛠️ Tech Stack
 
 | Layer | Technology |
 |---|---|
 | Frontend | React (static SPA) |
-| Backend | Python / FastAPI |
+| Backend | Python / FastAPI + Mangum |
 | Containerization | Docker / Amazon ECR |
-| Compute | AWS ECS Fargate (Serverless) |
-| Load Balancing | AWS Application Load Balancer (ALB) |
+| Compute | AWS Lambda (Serverless, Container Image) |
 | CDN | AWS CloudFront |
 | Static Hosting | AWS S3 |
 | Secrets Management | AWS SSM Parameter Store |
@@ -118,5 +107,5 @@ This project goes beyond a simple AI integration tool — it is an **enterprise-
 All infrastructure is automated and managed via **Terraform**, with a focus on high availability, global low latency (TTFB < 50ms), and cost optimization:
 
 - **Frontend (Global Edge Caching):** Static assets (React build) are hosted on **Amazon S3** and distributed globally via **CloudFront CDN** edge nodes, delivering near-instant page loads worldwide.
-- **Backend (Serverless Compute):** Dynamic API requests are received by an **Application Load Balancer (ALB)** and forwarded to a containerized FastAPI app running on **ECS Fargate** — no server management required, with elastic auto-scaling built in.
-- **Security & Cost Optimization:** The entire system follows a **Zero-Trust** architecture, with strict VPC segmentation and Security Group rules that block all traffic not originating from the ALB. Network routing was further optimized to eliminate the expensive **NAT Gateway** dependency, significantly reducing operating costs.
+- **Backend (Serverless Compute):** Dynamic API requests are routed by CloudFront directly to **AWS Lambda** via a Function URL, using the `AllViewerExceptHostHeader` origin request policy to ensure correct host resolution. The FastAPI app runs as a container image with **Mangum** as the ASGI adapter, requiring zero server management.
+- **Security & Cost Optimization:** The entire system follows a **Zero-Trust** architecture. Migrating from ECS + ALB to Lambda eliminated over $20/month in fixed infrastructure costs (ALB hourly fees, cross-AZ data transfer, ECS compute). Lambda's pay-per-invocation model means near-zero cost during low-traffic periods.
